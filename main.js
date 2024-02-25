@@ -26,7 +26,11 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!drawing) return;
         var point = { x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop };
         points.push(point);
+        // Clear and redraw everything including temporary line and text
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawTemporaryLine(points);
+        // Redraw the text without clearing the canvas
+        drawText(true);
     }
 
     function drawTemporaryLine(points) {
@@ -96,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!keepContent) ctx.clearRect(0, 0, canvas.width, canvas.height); // Optionally clear the canvas
 
         // Set text properties
-        ctx.font = '24px Arial';
+        ctx.font = '24px Comic Sans MS';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -108,7 +112,17 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.fillText(textContent, centerX, centerY);
     }
 
-    window.drawText = drawText;
+    // Function to update and draw text from the input field
+    function updateText() {
+        textContent = document.getElementById('textInput').value; // Get the text from the input
+        // Redraw everything to update the text on canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (points.length > 1) drawTemporaryLine(points); // Redraw the line if it exists
+        drawText(true); // Draw the text without clearing the canvas
+    }
+
+    window.drawText = updateText; // Make updateText function accessible from the button's onclick
+
 
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
