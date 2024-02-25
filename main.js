@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var ctx = canvas.getContext('2d');
     var drawing = false;
     var points = []; // Store points to draw a smooth curve
+    var textContent = ''; // Store the current text content
 
     function startDrawing(e) {
         drawing = true;
@@ -11,8 +12,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function stopDrawing() {
         drawing = false;
-        drawSmoothCurveAndArrow(points);
-        points = []; // Reset points array for the next drawing
+        if (points.length > 1) {
+            drawSmoothCurveAndArrow(points);
+            points = []; // Reset points array for the next drawing
+        }
+        if (textContent) {
+            // Redraw the text over the curve and arrow
+            drawText(true);
+        }
     }
 
     function draw(e) {
@@ -79,6 +86,29 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.moveTo(tox, toy);
         ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 7), toy - headlen * Math.sin(angle + Math.PI / 7));
     }
+
+    // New function to draw text
+    function drawText(keepContent = false) {
+        var text = document.getElementById('textInput').value;
+        textContent = keepContent ? textContent : text; // Update text content if not keeping previous
+        if (!textContent) return; // Don't draw if the text is empty
+
+        if (!keepContent) ctx.clearRect(0, 0, canvas.width, canvas.height); // Optionally clear the canvas
+
+        // Set text properties
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Calculate position
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+
+        // Draw the text
+        ctx.fillText(textContent, centerX, centerY);
+    }
+
+    window.drawText = drawText;
 
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
