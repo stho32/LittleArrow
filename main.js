@@ -4,21 +4,25 @@ document.addEventListener("DOMContentLoaded", function() {
     var drawing = false;
     var points = []; // Store points to draw a smooth curve
     var textContent = ''; // Store the current text content
+    var lastPoint = null; // Store the last point to control drawing frequency
 
     function getLineSettings() {
         return {
             color: document.getElementById('lineColor').value,
             width: parseInt(document.getElementById('lineWidth').value, 10),
+            smoothness: parseInt(document.getElementById('smoothness').value, 10)
         };
     }
 
     function startDrawing(e) {
         drawing = true;
-        points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
+        lastPoint = { x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop };
+        points.push(lastPoint);
     }
 
     function stopDrawing() {
         drawing = false;
+        lastPoint = null;
         if (points.length > 1) {
             drawSmoothCurveAndArrow(points);
             points = []; // Reset points array for the next drawing
@@ -30,11 +34,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function draw(e) {
         if (!drawing) return;
-        var point = { x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop };
-        points.push(point);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawTemporaryLine(points);
-        drawText(true);
+        var currentPoint = { x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop };
+        // Adjust point adding based on smoothness
+        var settings = getLineSettings();
+        if (shouldAddPoint(lastPoint, currentPoint, settings.smoothness)) {
+            points.push(currentPoint);
+            lastPoint = currentPoint;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawTemporaryLine(points);
+            drawText(true);
+        }
+    }
+
+    function shouldAddPoint(lastPoint, currentPoint, smoothness) {
+        var maxDistance = 11 - smoothness; // Inverse relationship: higher smoothness = less frequent points
+        var distance = Math.sqrt(Math.pow(currentPoint.x - lastPoint.x, 2) + Math.pow(currentPoint.y - lastPoint.y, 2));
+        return distance > maxDistance;
     }
 
     function drawTemporaryLine(points) {
