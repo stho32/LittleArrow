@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", function() {
     var points = []; // Store points to draw a smooth curve
     var textContent = ''; // Store the current text content
 
+    function getLineSettings() {
+        return {
+            color: document.getElementById('lineColor').value,
+            width: parseInt(document.getElementById('lineWidth').value, 10),
+        };
+    }
+
     function startDrawing(e) {
         drawing = true;
         points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
@@ -17,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function() {
             points = []; // Reset points array for the next drawing
         }
         if (textContent) {
-            // Redraw the text over the curve and arrow
             drawText(true);
         }
     }
@@ -26,14 +32,16 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!drawing) return;
         var point = { x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop };
         points.push(point);
-        // Clear and redraw everything including temporary line and text
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawTemporaryLine(points);
-        // Redraw the text without clearing the canvas
         drawText(true);
     }
 
     function drawTemporaryLine(points) {
+        var settings = getLineSettings();
+        ctx.strokeStyle = settings.color;
+        ctx.lineWidth = settings.width;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
@@ -54,6 +62,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function drawSmoothCurveAndArrow(points) {
+        var settings = getLineSettings();
+        ctx.strokeStyle = settings.color;
+        ctx.lineWidth = settings.width;
+                
         if (points.length < 3) return; // Need at least 3 points to draw a smooth curve
 
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
@@ -93,11 +105,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // New function to draw text
     function drawText(keepContent = false) {
+        if (!keepContent) ctx.clearRect(0, 0, canvas.width, canvas.height); // Optionally clear the canvas
+
         var text = document.getElementById('textInput').value;
         textContent = keepContent ? textContent : text; // Update text content if not keeping previous
-        if (!textContent) return; // Don't draw if the text is empty
 
-        if (!keepContent) ctx.clearRect(0, 0, canvas.width, canvas.height); // Optionally clear the canvas
+        if (!textContent) return; // Don't draw if the text is empty
 
         // Set text properties
         ctx.font = '24px Comic Sans MS';
