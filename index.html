@@ -6,6 +6,8 @@
     <title>Whiteboard</title>
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- KnockoutJS CDN -->
+    <script src="./knockout-3.5.1.js"></script>
     <style>
         #myCanvas {
             border:1px solid #000;
@@ -17,7 +19,7 @@
 </head>
 <body>
 
-<div class="container-fluid">
+<div class="container-fluid" data-bind="with: whiteboardVM">
     <div style="height:0px">
     </div>
     <div class="row">
@@ -29,40 +31,42 @@
         <!-- Tool Buttons Column -->
         <div class="col-md-2">
             <div class="btn-group-vertical" data-toggle="buttons">
-                <label class="btn btn-secondary active tool-button">
-                    <input type="radio" name="tools" id="curveArrow" autocomplete="off" checked> Curved line with Arrow
+                <!-- Binding radio button selection to the ViewModel -->
+                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'curveArrow' }">
+                    <input type="radio" name="tools" id="curveArrow" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'curveArrow'"> Curved line with Arrow
                 </label>
-                <label class="btn btn-secondary tool-button">
-                    <input type="radio" name="tools" id="straightLine" autocomplete="off"> Straight Line
+                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'straightLine' }">
+                    <input type="radio" name="tools" id="straightLine" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'straightLine'"> Straight Line
                 </label>
-                <label class="btn btn-secondary tool-button">
-                    <input type="radio" name="tools" id="highlight" autocomplete="off"> Highlight
+                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'highlight' }">
+                    <input type="radio" name="tools" id="highlight" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'highlight'"> Highlight
                 </label>
-                <label class="btn btn-secondary tool-button">
-                    <input type="radio" name="tools" id="delete" autocomplete="off"> Delete
+                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'delete' }">
+                    <input type="radio" name="tools" id="delete" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'delete'"> Delete
                 </label>
             </div>
         </div>
 
         <!-- Settings Column -->
         <div class="col-md-3">
+            <!-- Binding inputs to the ViewModel -->
             <div class="form-group">
                 <label for="lineColor">Line Color:</label>
-                <input type="color" id="lineColor" class="form-control" value="#000000">
+                <input type="color" id="lineColor" class="form-control" data-bind="value: lineColor, valueUpdate: 'input'">
             </div>
             
             <div class="form-group">
                 <label for="lineWidth">Line Width:</label>
-                <input type="number" id="lineWidth" class="form-control" value="2" min="1" max="10">
+                <input type="number" id="lineWidth" class="form-control" data-bind="value: lineWidth, valueUpdate: 'input'">
             </div>
             
             <div class="form-group">
                 <label for="smoothness">Smoothness:</label>
-                <input type="range" id="smoothness" class="custom-range" min="1" max="10" value="5">
+                <input type="range" id="smoothness" class="custom-range" data-bind="value: smoothness, valueUpdate: 'input'">
             </div>
 
             <div class="form-group">
-                <input type="text" id="textInput" class="form-control" placeholder="Enter text here">
+                <input type="text" id="textInput" class="form-control" data-bind="value: textInput, valueUpdate: 'input'">
                 <button onclick="drawText()" class="btn btn-primary mt-2">Add Text</button>
             </div>
         </div>
@@ -70,7 +74,40 @@
 </div>
 
 <!-- Your custom script -->
-<script src="main.js"></script>
+<script>
+// ViewModel definition
+function WhiteboardViewModel() {
+    var self = this;
+
+    self.selectedTool = ko.observable('curveArrow');
+    self.lineColor = ko.observable('#000000');
+    self.lineWidth = ko.observable(2);
+    self.smoothness = ko.observable(5);
+    self.textInput = ko.observable('');
+
+    // Subscriptions to log changes to the console
+    self.selectedTool.subscribe(function(newValue) {
+        console.log('Tool selected:', newValue);
+    });
+    self.lineColor.subscribe(function(newValue) {
+        console.log('Line color changed:', newValue);
+    });
+    self.lineWidth.subscribe(function(newValue) {
+        console.log('Line width changed:', newValue);
+    });
+    self.smoothness.subscribe(function(newValue) {
+        console.log('Smoothness changed:', newValue);
+    });
+    self.textInput.subscribe(function(newValue) {
+        console.log('Text input changed:', newValue);
+    });
+}
+
+// Activating KnockoutJS
+ko.applyBindings({
+    whiteboardVM: new WhiteboardViewModel()
+});
+</script>
 
 <!-- Bootstrap JS, Popper.js, and jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
