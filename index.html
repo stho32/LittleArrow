@@ -95,6 +95,7 @@ function WhiteboardViewModel() {
     self.smoothness = ko.observable(5);
     self.textInput = ko.observable('');
     self.drawableObjects = ko.observableArray([]);
+    self.currentlyDrawnObject = null;
 
     // Subscriptions to log changes to the console
     self.selectedTool.subscribe(function(newValue) {
@@ -136,6 +137,11 @@ function WhiteboardViewModel() {
                 drawableObject.draw(context);
             }
         });
+
+        // Draw the currently drawn object if it exists
+        if (self.currentlyDrawnObject && typeof self.currentlyDrawnObject.draw === 'function') {
+            self.currentlyDrawnObject.draw(context);
+        }
     };
 
     self.addElement = function() {
@@ -156,11 +162,58 @@ function WhiteboardViewModel() {
         self.drawableObjects.remove(item);
         self.drawAll(); 
     };
+
+    self.startDrawing = function(canvas, event) {
+        var rect = canvas.getBoundingClientRect();
+        var startX = event.clientX - rect.left;
+        var startY = event.clientY - rect.top;
+        self.currentlyDrawnObject = new ArrowLine(self.lineColor(), self.lineWidth(), self.smoothness());
+        self.currentlyDrawnObject.setStart(startX, startY);
+    };
+
+    self.updateDrawing = function(canvas, event) {
+        if (self.currentlyDrawnObject) {
+            var rect = canvas.getBoundingClientRect();
+            var currentX = event.clientX - rect.left;
+            var currentY = event.clientY - rect.top;
+            self.currentlyDrawnObject.setEnd(currentX, currentY);
+            self.drawAll();
+            self.currentlyDrawnObject.draw(canvas.getContext('2d')); // Draw the currently drawn object
+        }
+    };
+
+    self.endDrawing = function() {
+        if (self.currentlyDrawnObject) {
+            self.drawableObjects.push(self.currentlyDrawnObject);
+            self.currentlyDrawnObject = null;
+            self.drawAll();
+        }
+    };
 }
 
 // Activating KnockoutJS
+var viewModel = new WhiteboardViewModel();
 ko.applyBindings({
-    whiteboardVM: new WhiteboardViewModel()
+    whiteboardVM: viewModel
+});
+
+var canvas = document.getElementById('myCanvas');
+canvas.addEventListener('mousedown', function(event) {
+    if (event.button === 0) { // Left mouse button
+        viewModel.startDrawing(canvas, event);
+    }
+});
+canvas.addEventListener('mousemove', function(event) {
+    viewModel.updateDrawing(canvas, event);
+});
+canvas.addEventListener('mouseup', function(event) {
+    if (event.button === 0) { // Left mouse button
+        viewModel.endDrawing();
+    }
+});
+canvas.addEventListener('mouseleave', function(event) {
+    // Optional: if you want to cancel the drawing when the mouse leaves the canvas
+    viewModel.currentlyDrawnObject = null;
 });
 </script>
 
