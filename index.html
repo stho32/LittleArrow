@@ -49,7 +49,12 @@
 
             <button data-bind="click: addElement">Add</button>
 
-            // add list here           
+            <ul data-bind="foreach: drawableObjects">
+                <li>
+                    <span data-bind="text: type"></span>
+                    <button data-bind="click: $parent.removeElement">Delete</button>
+                </li>
+            </ul>
         </div>
 
         <!-- Settings Column -->
@@ -139,7 +144,6 @@ function WhiteboardViewModel() {
         // Example start and end points, this should be replaced with actual mouse coordinates
         myArrowLine.setStart(Math.random() * 600, Math.random() * 600);
         myArrowLine.setEnd(Math.random() * 600, Math.random() * 600);
-        
 
         // Push the new ArrowLine to the drawableObjects array
         self.drawableObjects.push(myArrowLine);
@@ -147,6 +151,11 @@ function WhiteboardViewModel() {
         // Draw all elements including the new one
         self.drawAll();
     }
+
+    self.removeElement = function(item) {
+        self.drawableObjects.remove(item);
+        self.drawAll(); 
+    };
 }
 
 // Activating KnockoutJS
