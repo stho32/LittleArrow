@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- KnockoutJS CDN -->
     <script src="./knockout-3.5.1.js"></script>
+    <script src="./arrowline.js"></script>
     <style>
         #myCanvas {
             border:1px solid #000;
@@ -45,6 +46,10 @@
                     <input type="radio" name="tools" id="delete" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'delete'"> Delete
                 </label>
             </div>
+
+            <button data-bind="click: addElement">Add</button>
+
+            // add list here           
         </div>
 
         <!-- Settings Column -->
@@ -84,6 +89,7 @@ function WhiteboardViewModel() {
     self.lineWidth = ko.observable(2);
     self.smoothness = ko.observable(5);
     self.textInput = ko.observable('');
+    self.drawableObjects = ko.observableArray([]);
 
     // Subscriptions to log changes to the console
     self.selectedTool.subscribe(function(newValue) {
@@ -101,6 +107,46 @@ function WhiteboardViewModel() {
     self.textInput.subscribe(function(newValue) {
         console.log('Text input changed:', newValue);
     });
+
+    self.addElement = function() {
+        let myArrowLine = new ArrowLine(self.lineColor(), self.smoothness(), self.lineWidth());
+
+        myArrowLine.setStart(50, 50);
+        myArrowLine.setEnd(150, 150);
+
+        self.drawableObjects.push(myArrowLine);
+        console.log(self.drawableObjects());
+    }
+
+    self.drawAll = function() {
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+
+        // Clear the canvas before redrawing
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Loop through all drawable objects and call their draw method
+        self.drawableObjects().forEach(function(drawableObject) {
+            if (typeof drawableObject.draw === 'function') {
+                drawableObject.draw(context);
+            }
+        });
+    };
+
+    self.addElement = function() {
+        let myArrowLine = new ArrowLine(self.lineColor(), self.lineWidth(), self.smoothness());
+
+        // Example start and end points, this should be replaced with actual mouse coordinates
+        myArrowLine.setStart(Math.random() * 600, Math.random() * 600);
+        myArrowLine.setEnd(Math.random() * 600, Math.random() * 600);
+        
+
+        // Push the new ArrowLine to the drawableObjects array
+        self.drawableObjects.push(myArrowLine);
+
+        // Draw all elements including the new one
+        self.drawAll();
+    }
 }
 
 // Activating KnockoutJS
