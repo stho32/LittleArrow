@@ -1,6 +1,6 @@
-class ArrowLine {
+class CurvedLine {
     constructor(lineColor, lineWidth, smoothness) {
-        this.type = 'arrowLine';
+        this.type = 'curvedLine';
         this.lineColor = lineColor;
         this.lineWidth = lineWidth;
         this.smoothness = smoothness;
@@ -37,7 +37,7 @@ class ArrowLine {
     // Method to draw the curved line with an arrow on the canvas
     draw(context) {
         if (this.points.length < 2) {
-            console.error('ArrowLine draw called without enough points.');
+            console.error('CurvedLine draw called without enough points.');
             return;
         }
 

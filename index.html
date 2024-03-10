@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- KnockoutJS CDN -->
     <script src="./knockout-3.5.1.js"></script>
-    <script src="./arrowline.js"></script>
+    <script src="./curvedline.js"></script>
     <style>
         #myCanvas {
             border:1px solid #000;
@@ -33,8 +33,8 @@
         <div class="col-md-2">
             <div class="btn-group-vertical" data-toggle="buttons">
                 <!-- Binding radio button selection to the ViewModel -->
-                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'curveArrow' }">
-                    <input type="radio" name="tools" id="curveArrow" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'curveArrow'"> Curved line with Arrow
+                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'curvedLine' }">
+                    <input type="radio" name="tools" id="curvedLine" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'curvedLine'"> Curved Line
                 </label>
                 <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'straightLine' }">
                     <input type="radio" name="tools" id="straightLine" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'straightLine'"> Straight Line
@@ -46,8 +46,6 @@
                     <input type="radio" name="tools" id="delete" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'delete'"> Delete
                 </label>
             </div>
-
-            <button data-bind="click: addElement">Add</button>
 
             <ul data-bind="foreach: drawableObjects">
                 <li>
@@ -89,7 +87,7 @@
 function WhiteboardViewModel() {
     var self = this;
 
-    self.selectedTool = ko.observable('curveArrow');
+    self.selectedTool = ko.observable('curvedLine');
     self.lineColor = ko.observable('#000000');
     self.lineWidth = ko.observable(2);
     self.smoothness = ko.observable(5);
@@ -114,16 +112,6 @@ function WhiteboardViewModel() {
         console.log('Text input changed:', newValue);
     });
 
-    self.addElement = function() {
-        let myArrowLine = new ArrowLine(self.lineColor(), self.smoothness(), self.lineWidth());
-
-        myArrowLine.setStart(50, 50);
-        myArrowLine.addPoint(150, 150);
-
-        self.drawableObjects.push(myArrowLine);
-        console.log(self.drawableObjects());
-    }
-
     self.drawAll = function() {
         var canvas = document.getElementById('myCanvas');
         var context = canvas.getContext('2d');
@@ -144,20 +132,6 @@ function WhiteboardViewModel() {
         }
     };
 
-    self.addElement = function() {
-        let myArrowLine = new ArrowLine(self.lineColor(), self.lineWidth(), self.smoothness());
-
-        // Example start and end points, this should be replaced with actual mouse coordinates
-        myArrowLine.setStart(Math.random() * 600, Math.random() * 600);
-        myArrowLine.setEnd(Math.random() * 600, Math.random() * 600);
-
-        // Push the new ArrowLine to the drawableObjects array
-        self.drawableObjects.push(myArrowLine);
-
-        // Draw all elements including the new one
-        self.drawAll();
-    }
-
     self.removeElement = function(item) {
         self.drawableObjects.remove(item);
         self.drawAll(); 
@@ -167,7 +141,7 @@ function WhiteboardViewModel() {
         var rect = canvas.getBoundingClientRect();
         var startX = event.clientX - rect.left;
         var startY = event.clientY - rect.top;
-        self.currentlyDrawnObject = new ArrowLine(self.lineColor(), self.lineWidth(), self.smoothness());
+        self.currentlyDrawnObject = new CurvedLine(self.lineColor(), self.lineWidth(), self.smoothness());
         self.currentlyDrawnObject.setStart(startX, startY);
     };
 
