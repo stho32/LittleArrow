@@ -15,7 +15,23 @@ class ArrowLine {
 
     // Method to collect points, renamed for clarity
     addPoint(x, y) {
-        this.points.push({ x, y });
+        if (this.shouldAddPoint(x, y)) {
+            this.points.push({ x, y });
+        }
+    }
+
+    shouldAddPoint(x, y) {
+        const lastPoint = this.points[this.points.length - 1];
+        if (!lastPoint) return true; // Always add if there are no previous points
+
+        const smoothnessFactor = Math.max(1, this.smoothness); // Ensure smoothnessFactor is at least 1
+        const maxDistance = smoothnessFactor; // Adjust this formula as needed
+
+        const dx = x - lastPoint.x;
+        const dy = y - lastPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        return distance > maxDistance;
     }
 
     // Method to draw the curved line with an arrow on the canvas
