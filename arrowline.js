@@ -1,34 +1,27 @@
 class ArrowLine {
     constructor(lineColor, lineWidth, smoothness) {
-        this.type = 'arrowLine'; // Fixed type for all instances
+        this.type = 'arrowLine';
         this.lineColor = lineColor;
         this.lineWidth = lineWidth;
         this.smoothness = smoothness;
-
-        // Additional properties for start and end coordinates
-        // These would be set when the line is actually drawn
-        this.startX = null;
-        this.startY = null;
-        this.endX = null;
-        this.endY = null;
+        this.points = []; // Array to hold points
     }
 
     // Method to set the start coordinates of the line
     setStart(x, y) {
-        this.startX = x;
-        this.startY = y;
+        // Reset points array with the new start point
+        this.points = [{ x, y }];
     }
 
-    // Method to set the end coordinates of the line
-    setEnd(x, y) {
-        this.endX = x;
-        this.endY = y;
+    // Method to collect points, renamed for clarity
+    addPoint(x, y) {
+        this.points.push({ x, y });
     }
 
-    // Method to draw the line with an arrow on the canvas
+    // Method to draw the curved line with an arrow on the canvas
     draw(context) {
-        if (this.startX === null || this.startY === null || this.endX === null || this.endY === null) {
-            console.error('ArrowLine draw called without setting start or end points.');
+        if (this.points.length < 2) {
+            console.error('ArrowLine draw called without enough points.');
             return;
         }
 
@@ -38,19 +31,46 @@ class ArrowLine {
         context.lineJoin = 'round';
         context.lineCap = 'round';
 
-        // Drawing the line
+        // Begin the drawing path
         context.beginPath();
-        context.moveTo(this.startX, this.startY);
-        context.lineTo(this.endX, this.endY);
+        context.moveTo(this.points[0].x, this.points[0].y);
 
-        // Drawing the arrow head
-        var headlen = 10; // length of head in pixels
-        var angle = Math.atan2(this.endY - this.startY, this.endX - this.startX);
-        context.lineTo(this.endX - headlen * Math.cos(angle - Math.PI / 6), this.endY - headlen * Math.sin(angle - Math.PI / 6));
-        context.moveTo(this.endX, this.endY);
-        context.lineTo(this.endX - headlen * Math.cos(angle + Math.PI / 6), this.endY - headlen * Math.sin(angle + Math.PI / 6));
+        // Draw smooth curve through the points
+        for (let i = 1; i < this.points.length - 2; i++) {
+            let c = (this.points[i].x + this.points[i + 1].x) / 2;
+            let d = (this.points[i].y + this.points[i + 1].y) / 2;
+            context.quadraticCurveTo(this.points[i].x, this.points[i].y, c, d);
+        }
 
-        // Apply the stroke
+        // Handle the last two points
+        if (this.points.length > 2) {
+            let last = this.points.length - 1;
+            context.quadraticCurveTo(
+                this.points[last - 1].x, this.points[last - 1].y,
+                this.points[last].x, this.points[last].y);
+        }
+
+        context.stroke();
+
+        // Draw arrow at the end of the curve
+        if (this.points.length > 1) {
+            let end = this.points[this.points.length - 1];
+            let start = this.points[this.points.length - 2];
+            this.drawArrow(context, start.x, start.y, end.x, end.y);
+        }
+    }
+
+    // Method to draw an arrow on the canvas
+    drawArrow(context, fromx, fromy, tox, toy) {
+        let headlen = 10; // length of head in pixels
+        let dx = tox - fromx;
+        let dy = toy - fromy;
+        let angle = Math.atan2(dy, dx);
+
+        context.moveTo(tox, toy);
+        context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+        context.moveTo(tox, toy);
+        context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
         context.stroke();
     }
 }

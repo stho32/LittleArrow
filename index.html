@@ -118,7 +118,7 @@ function WhiteboardViewModel() {
         let myArrowLine = new ArrowLine(self.lineColor(), self.smoothness(), self.lineWidth());
 
         myArrowLine.setStart(50, 50);
-        myArrowLine.setEnd(150, 150);
+        myArrowLine.addPoint(150, 150);
 
         self.drawableObjects.push(myArrowLine);
         console.log(self.drawableObjects());
@@ -176,7 +176,7 @@ function WhiteboardViewModel() {
             var rect = canvas.getBoundingClientRect();
             var currentX = event.clientX - rect.left;
             var currentY = event.clientY - rect.top;
-            self.currentlyDrawnObject.setEnd(currentX, currentY);
+            self.currentlyDrawnObject.addPoint(currentX, currentY);
             self.drawAll();
             self.currentlyDrawnObject.draw(canvas.getContext('2d')); // Draw the currently drawn object
         }
