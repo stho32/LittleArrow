@@ -48,8 +48,8 @@ class HighlightTool {
         // Setup highlight style
         context.strokeStyle = transparentColor;
         context.lineWidth = this.lineWidth;
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
+        context.lineJoin = 'square';
+        context.lineCap = 'square';
         context.globalCompositeOperation = 'multiply'; // Blend mode that works well for highlights
 
         // Draw the highlight

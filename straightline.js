@@ -13,12 +13,15 @@ class StraightLine {
     }
 
     addPoint(x, y) {
+        // When adding a point, adjust to make the line horizontal
         this.setEnd(x, y);
     }
 
     // Method to set the end point of the line
+    // Modified to ensure the line is always horizontal by keeping the y-coordinate consistent with the start
     setEnd(x, y) {
-        this.end = { x, y };
+        this.end = { x: x, y: y };
+        this.start = { x: this.start.x, y: this.end.y }
     }
 
     // Method to draw the straight line on the canvas
@@ -37,7 +40,7 @@ class StraightLine {
         // Draw the line
         context.beginPath();
         context.moveTo(this.start.x, this.start.y);
-        context.lineTo(this.end.x, this.end.y);
+        context.lineTo(this.end.x, this.end.y); // The y-coordinate is the same as the start's, ensuring horizontality
         context.stroke();
     }
 }
