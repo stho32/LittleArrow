@@ -2,7 +2,7 @@ class HighlightTool {
     constructor(lineColor, lineWidth) {
         this.type = 'highlight';
         this.lineColor = lineColor;
-        this.lineWidth = Math.max(20, lineWidth); // Ensuring a minimum width for visibility
+        this.lineWidth = Math.max(24, lineWidth); // Ensuring a minimum width for visibility
         this.start = null;
         this.end = null;
     }
