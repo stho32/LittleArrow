@@ -10,6 +10,7 @@
     <script src="./knockout-3.5.1.js"></script>
     <script src="./curvedline.js"></script>
     <script src="./straightLine.js"></script>
+    <script src="./highlightTool.js"></script>
     <script src="./textobject.js"></script>
     <style>
         #myCanvas {
@@ -43,9 +44,6 @@
                 </label>
                 <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'highlight' }">
                     <input type="radio" name="tools" id="highlight" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'highlight'"> Highlight
-                </label>
-                <label class="btn btn-secondary tool-button" data-bind="css: { active: selectedTool() === 'delete' }">
-                    <input type="radio" name="tools" id="delete" autocomplete="off" data-bind="checked: selectedTool, checkedValue: 'delete'"> Delete
                 </label>
             </div>
 
@@ -150,6 +148,9 @@ function WhiteboardViewModel() {
                 break;
             case 'straightLine':
                 self.currentlyDrawnObject = new StraightLine(self.lineColor(), self.lineWidth());
+                break;
+            case 'highlight':
+                self.currentlyDrawnObject = new HighlightTool(self.lineColor(), self.lineWidth());
                 break;
             default:
                 console.warn("Unknown tool selected:", self.selectedTool());
