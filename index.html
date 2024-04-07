@@ -76,8 +76,7 @@
             </div>
 
             <div class="form-group">
-                <input type="text" id="textInput" class="form-control" data-bind="value: textInput, valueUpdate: 'input'">
-                <button onclick="viewModel.drawText()" class="btn btn-primary mt-2">Add Text</button>
+                <textarea id="textInput" class="form-control" data-bind="value: textInput, valueUpdate: 'afterkeydown'" rows="5"></textarea>
             </div>
         </div>
     </div>
@@ -96,22 +95,21 @@ function WhiteboardViewModel() {
     self.textInput = ko.observable('');
     self.drawableObjects = ko.observableArray([]);
     self.currentlyDrawnObject = null;
+    self.textObject = ko.observable(null);
 
-    // Subscriptions to log changes to the console
-    self.selectedTool.subscribe(function(newValue) {
-        console.log('Tool selected:', newValue);
-    });
-    self.lineColor.subscribe(function(newValue) {
-        console.log('Line color changed:', newValue);
-    });
-    self.lineWidth.subscribe(function(newValue) {
-        console.log('Line width changed:', newValue);
-    });
-    self.smoothness.subscribe(function(newValue) {
-        console.log('Smoothness changed:', newValue);
-    });
+    // Update the textObject whenever the textInput changes
     self.textInput.subscribe(function(newValue) {
-        console.log('Text input changed:', newValue);
+        var textObj = self.textObject();
+        if (!textObj) {
+            // If no textObject exists, create one
+            textObj = new TextObject(newValue, canvas.width / 2, canvas.height / 2);
+            self.textObject(textObj);
+            self.drawableObjects.push(textObj);
+        } else {
+            // Update the existing textObject's text
+            textObj.text = newValue;
+        }
+        self.drawAll();
     });
 
     self.drawAll = function() {
@@ -163,11 +161,7 @@ function WhiteboardViewModel() {
         if (self.currentlyDrawnObject) {
             self.currentlyDrawnObject.setStart(startX, startY);
             
-            // // If the tool requires an immediate end point (e.g., straightLine),
-            // // set it to the start point initially. This can be updated later.
-            // if (self.selectedTool() === 'straightLine') {
-                self.currentlyDrawnObject.setEnd(startX, startY); // Initial end point same as start
-            // }
+            self.currentlyDrawnObject.setEnd(startX, startY); // Initial end point same as start
         }
     };
 
@@ -210,8 +204,9 @@ function WhiteboardViewModel() {
     };
 
     self.deleteAll = function() {
-        self.drawableObjects.removeAll(); // Clear all drawable objects
-        self.drawAll(); // Redraw the canvas, which will now be clear
+        self.drawableObjects.removeAll();
+        self.textObject(null); // Clear the single textObject
+        self.drawAll();
     };
 }
 
