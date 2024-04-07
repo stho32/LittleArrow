@@ -9,6 +9,7 @@
     <!-- KnockoutJS CDN -->
     <script src="./knockout-3.5.1.js"></script>
     <script src="./curvedline.js"></script>
+    <script src="./straightLine.js"></script>
     <script src="./textobject.js"></script>
     <style>
         #myCanvas {
@@ -142,9 +143,31 @@ function WhiteboardViewModel() {
         var rect = canvas.getBoundingClientRect();
         var startX = event.clientX - rect.left;
         var startY = event.clientY - rect.top;
-        self.currentlyDrawnObject = new CurvedLine(self.lineColor(), self.lineWidth(), self.smoothness());
-        self.currentlyDrawnObject.setStart(startX, startY);
+
+        switch (self.selectedTool()) {
+            case 'curvedLine':
+                self.currentlyDrawnObject = new CurvedLine(self.lineColor(), self.lineWidth(), self.smoothness());
+                break;
+            case 'straightLine':
+                self.currentlyDrawnObject = new StraightLine(self.lineColor(), self.lineWidth());
+                break;
+            default:
+                console.warn("Unknown tool selected:", self.selectedTool());
+                return; 
+        }
+
+        // Common setup for any drawing object
+        if (self.currentlyDrawnObject) {
+            self.currentlyDrawnObject.setStart(startX, startY);
+            
+            // // If the tool requires an immediate end point (e.g., straightLine),
+            // // set it to the start point initially. This can be updated later.
+            // if (self.selectedTool() === 'straightLine') {
+                self.currentlyDrawnObject.setEnd(startX, startY); // Initial end point same as start
+            // }
+        }
     };
+
 
     self.updateDrawing = function(canvas, event) {
         if (self.currentlyDrawnObject) {
@@ -199,11 +222,22 @@ canvas.addEventListener('mousedown', function(event) {
 canvas.addEventListener('mousemove', function(event) {
     viewModel.updateDrawing(canvas, event);
 });
+
 canvas.addEventListener('mouseup', function(event) {
     if (event.button === 0) { // Left mouse button
+        var rect = canvas.getBoundingClientRect();
+        var endX = event.clientX - rect.left;
+        var endY = event.clientY - rect.top;
+
+        // // If the current tool is straightLine, update the end point before ending the drawing
+        // if (viewModel.selectedTool() === 'straightLine' && viewModel.currentlyDrawnObject) {
+        viewModel.currentlyDrawnObject.setEnd(endX, endY);
+        // }
+
         viewModel.endDrawing();
     }
 });
+
 canvas.addEventListener('mouseleave', function(event) {
     // Optional: if you want to cancel the drawing when the mouse leaves the canvas
     viewModel.currentlyDrawnObject = null;

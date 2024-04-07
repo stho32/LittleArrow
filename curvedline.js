@@ -20,6 +20,10 @@ class CurvedLine {
         }
     }
 
+    setEnd(x, y) {
+        this.addPoint(x,y);
+    }
+
     shouldAddPoint(x, y) {
         const lastPoint = this.points[this.points.length - 1];
         if (!lastPoint) return true; // Always add if there are no previous points

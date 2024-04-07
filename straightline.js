@@ -12,6 +12,10 @@ class StraightLine {
         this.start = { x, y };
     }
 
+    addPoint(x, y) {
+        this.setEnd(x, y);
+    }
+
     // Method to set the end point of the line
     setEnd(x, y) {
         this.end = { x, y };
