@@ -185,24 +185,6 @@ function WhiteboardViewModel() {
         }
     };
 
-    self.drawText = function() {
-        var canvas = document.getElementById('myCanvas');
-        var context = canvas.getContext('2d');
-        var text = self.textInput();
-        if(text.trim() === '') return; // Don't add empty text
-
-        // Calculate center position
-        var centerX = canvas.width / 2;
-        var centerY = canvas.height / 2;
-
-        // Create TextObject instance
-        var textObj = new TextObject(text, centerX, centerY);
-
-        // Add to drawable objects and redraw
-        self.drawableObjects.push(textObj);
-        self.drawAll();
-    };
-
     self.deleteAll = function() {
         self.drawableObjects.removeAll();
         self.textObject(null); // Clear the single textObject
