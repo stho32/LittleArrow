@@ -47,6 +47,8 @@
                 </label>
             </div>
 
+            <button class="btn btn-danger mt-2" onclick="viewModel.deleteAll()">Delete All</button>
+
             <ul data-bind="foreach: drawableObjects">
                 <li>
                     <span data-bind="text: type"></span>
@@ -205,6 +207,11 @@ function WhiteboardViewModel() {
         // Add to drawable objects and redraw
         self.drawableObjects.push(textObj);
         self.drawAll();
+    };
+
+    self.deleteAll = function() {
+        self.drawableObjects.removeAll(); // Clear all drawable objects
+        self.drawAll(); // Redraw the canvas, which will now be clear
     };
 }
 
