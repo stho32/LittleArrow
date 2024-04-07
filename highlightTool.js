@@ -7,18 +7,20 @@ class HighlightTool {
         this.end = null;
     }
 
-    // Method to set the start point of the highlight
     setStart(x, y) {
         this.start = { x, y };
     }
 
     addPoint(x, y) {
+        // When adding a point, adjust to make the line horizontal
         this.setEnd(x, y);
     }
 
-    // Method to set the end point of the highlight
+    // Method to set the end point of the line
+    // Modified to ensure the line is always horizontal by keeping the y-coordinate consistent with the start
     setEnd(x, y) {
-        this.end = { x, y };
+        this.end = { x: x, y: y };
+        this.start = { x: this.start.x, y: this.end.y }
     }
 
     // Converts a hex color to an RGBA string with the specified alpha value
