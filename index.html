@@ -9,6 +9,7 @@
     <!-- KnockoutJS CDN -->
     <script src="./knockout-3.5.1.js"></script>
     <script src="./curvedline.js"></script>
+    <script src="./textobject.js"></script>
     <style>
         #myCanvas {
             border:1px solid #000;
@@ -75,7 +76,7 @@
 
             <div class="form-group">
                 <input type="text" id="textInput" class="form-control" data-bind="value: textInput, valueUpdate: 'input'">
-                <button onclick="drawText()" class="btn btn-primary mt-2">Add Text</button>
+                <button onclick="viewModel.drawText()" class="btn btn-primary mt-2">Add Text</button>
             </div>
         </div>
     </div>
@@ -162,6 +163,24 @@ function WhiteboardViewModel() {
             self.currentlyDrawnObject = null;
             self.drawAll();
         }
+    };
+
+    self.drawText = function() {
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        var text = self.textInput();
+        if(text.trim() === '') return; // Don't add empty text
+
+        // Calculate center position
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+
+        // Create TextObject instance
+        var textObj = new TextObject(text, centerX, centerY);
+
+        // Add to drawable objects and redraw
+        self.drawableObjects.push(textObj);
+        self.drawAll();
     };
 }
 
